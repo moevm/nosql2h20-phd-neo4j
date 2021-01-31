@@ -4,18 +4,24 @@
 <main role="main" class="inner cover">
     <h1 class="cover-heading">Просмотр успехов</h1>
 
-    <form action="/" method="POST">
+    <form action="/watch" method="POST">
         <div class="form-group">
-            <input type="text" class="form-control" name="UrlInput" id="UrlInput" aria-describedby="gradeHelp"
-                   placeholder="Your URL">
+            <input type="text" class="form-control" name="Name" id="Name" aria-describedby="gradeHelp"
+                   placeholder="Имя">
         </div>
 
-        <button type="submit" class="btn btn-lg btn-secondary">Cut!</button>
+        <div class="form-group">
+            <input type="text" class="form-control" name="Surname" id="Surname" aria-describedby="gradeHelp"
+                   placeholder="Фамилия">
+        </div>
 
-        {% if tiny_url %}
-        <p class="lead">New url is</p>
-        <a href={{tiny_url}}>{{tiny_url}}</a>
-        {% endif %}
+        <div class="form-group">
+            <input type="text" class="form-control" name="Patronymic" id="Patronymic" aria-describedby="gradeHelp"
+                   placeholder="Отчество">
+        </div>
+
+        <button type="submit" class="btn btn-lg btn-secondary">Посмотреть!</button>
+
     </form>
 </main>
 {% endblock %}

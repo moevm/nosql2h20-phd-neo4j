@@ -1,76 +1,64 @@
-from collections import deque
-from functools import lru_cache
-
 from flask import Flask
 from flask import render_template
 from flask import request
 
-CACHE_SIZE = 100
-
-
-class MyApp:
-    length_of_a_hash = 6
-    divider = 10 ** length_of_a_hash
-    max_capacity = 8192
-
-    def __init__(self):
-        self._urls = deque()
-        self.urls_mapping = {}
-
-    @lru_cache(maxsize=CACHE_SIZE)
-    def add_url(self, url):
-        tiny_url = int(hash(url) % self.divider)
-        self._urls.append(tiny_url)
-        self.urls_mapping[tiny_url] = url
-
-        if len(self._urls) > self.max_capacity:
-            self.delete_url()
-
-        return tiny_url
-
-    def delete_url(self):
-        url_to_delete = self._urls.popleft()
-        self.urls_mapping.pop(url_to_delete)
-
-    @lru_cache(maxsize=CACHE_SIZE)
-    def check_url(self, url):
-        return url in self._urls
-
-    @lru_cache(maxsize=CACHE_SIZE)
-    def get_url(self, url):
-        return self.urls_mapping[url]
-
+from backend import MyApp
 
 app = MyApp()
 
 app_server = Flask(__name__, static_folder='static')
 
-
-# @app_server.route('/', methods=['GET', 'POST'])
-# def index():
-#     if request.method == 'POST':
-#         url = request.form['UrlInput']
-#         tiny_url = app.add_url(url)
-#         return render_template('home.html', tiny_url=request.base_url + str(tiny_url))
-#
-#     return render_template('home.html')
+student_id = 0
+work_id = 0
 
 
-@app_server.route('/')
-def about():
+@app_server.route('/', methods=['GET', 'POST'])
+def home():
     return render_template('home.html')
 
 
-@app_server.route('/add_asp')
+@app_server.route('/add_asp', methods=['GET', 'POST'])
 def add_asp():
+    if request.method == 'POST':
+        print("Запрос на добавление аспиранта")
+        student = {
+            'id': student_id,
+            'name': request.form['Name'],
+            'surname': request.form['Surname'],
+            'patronymic': request.form['Patronymic'],
+            'group_number': request.form['GroupNumber'],
+            'year_of_admission': request.form['Year'],
+            'email': request.form['Email'],
+            'login': request.form['Login'],
+            'password': request.form['Pass'],
+        }
+
+        app.add_graduate(student)
+
+        return render_template('add_asp.html')
+
     return render_template('add_asp.html')
 
 
-@app_server.route('/add_task')
+@app_server.route('/add_task', methods=['GET', 'POST'])
 def add_task():
+    if request.method == 'POST':
+        print("Запрос на добавление работы")
+
     return render_template('add_task.html')
 
 
-@app_server.route('/watch')
+@app_server.route('/watch', methods=['GET', 'POST'])
 def watch():
+    if request.method == 'POST':
+        print("Запрос на просмотр статистики")
+
+        student = {
+            'name': request.form['Name'],
+            'surname': request.form['Surname'],
+            'patronymic': request.form['Patronymic'],
+        }
+        list = app.find_student(student)
+        return "<p>" + "</p><p>".join(list) + "</p>"
+
     return render_template('watch.html')

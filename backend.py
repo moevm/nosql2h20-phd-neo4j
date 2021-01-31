@@ -18,9 +18,6 @@ index_to_work = {
 
 work_to_index = {key: value for value, key in index_to_work.items()}
 
-student_id = 0
-work_id = 0
-
 
 class MyApp:
     def __init__(self, uri="bolt://localhost:11003",
@@ -57,6 +54,35 @@ class MyApp:
                 query=query, exception=exception))
             raise
 
+    # login: $login, password: $password
+
+    def assosiate_work_and_student(self, student_id, work_id):
+        with self.driver.session() as session:
+            # Write transactions allow the driver to handle retries and transient errors
+            result = session.write_transaction(
+                self._assosiate_work_and_student, student_id, work_id)
+
+            for record in result:
+                print(f"Assosiated student with id: {record['g']['id']} and work with id: {record['w']['id']}")
+
+    @staticmethod
+    def _assosiate_work_and_student(tx, student_id, work_id):
+        query = (
+            "MATCH(g:Graduate {id: $student_id})"
+            "MATCH(w:Work {id: $work_id})"
+            "CREATE (g)-[:DID]->(w) "
+            "RETURN g, w"
+        )
+        result = tx.run(query, student_id=student_id, work_id=work_id)
+        try:
+            return [{"g": record["g"],
+                     "w": record["w"]} for record in result]
+        # Capture any errors along with the query and data for traceability
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
     def add_work(self, work_dict):
         with self.driver.session() as session:
             # Write transactions allow the driver to handle retries and transient errors
@@ -81,27 +107,43 @@ class MyApp:
                 query=query, exception=exception))
             raise
 
-    def assosiate_work_and_student(self, student_id, work_id):
+    def find_student(self, *args):
         with self.driver.session() as session:
             # Write transactions allow the driver to handle retries and transient errors
             result = session.write_transaction(
-                self._assosiate_work_and_student, student_id, work_id)
-
-            for record in result:
-                print(f"Assosiated student with id: {record['g']['id']} and work with id: {record['w']['id']}")
+                self._find_student, *args)
+            try:
+                student_id = str(result[0]['g']['id'])
+                works = session.write_transaction(
+                    self._find_students_works, student_id)
+                print(works)
+            except:
+                return ["No results"]
 
     @staticmethod
-    def _assosiate_work_and_student(tx, student_id, work_id):
+    def _find_student(tx, args):
         query = (
-            "MATCH(g:Graduate {id: $student_id})"
-            "MATCH(w:Work {id: $work_id})"
-            "CREATE (g)-[:DID]->(w) "
-            "RETURN g, w"
+            "MATCH(g:Graduate {name: $name, surname: $surname, patronymic: $patronymic})"
+            "RETURN g"
         )
-        result = tx.run(query, student_id=student_id, work_id=work_id)
+        result = tx.run(query, args)
         try:
-            return [{"g": record["g"],
-                     "w": record["w"]} for record in result]
+            return [{"g": record["g"]} for record in result]
+        # Capture any errors along with the query and data for traceability
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+    @staticmethod
+    def _find_students_works(tx, student_id):
+        query = (
+            "MATCH (g:Graduate {id: $student_id})-[:DID]->(w) "
+            "RETURN w"
+        )
+        result = tx.run(query, student_id=student_id)
+        try:
+            return result
         # Capture any errors along with the query and data for traceability
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
