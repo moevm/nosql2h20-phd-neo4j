@@ -11,12 +11,12 @@
 	<link rel="shortcut icon" href="images/favicon.ico">
     
 	<!-- CSS -->
-	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-	<link href="css/flexslider.css" rel="stylesheet" type="text/css" />
-	<link href="css/animate.css" rel="stylesheet" type="text/css" media="all" />
-    <link href="css/owl.carousel.css" rel="stylesheet">
-	<link href="css/style.css" rel="stylesheet" type="text/css" />
-	<link href="css/colors/" rel="stylesheet" type="text/css" id="colors" />
+	<link href="../css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<link href="../css/flexslider.css" rel="stylesheet" type="text/css" />
+	<link href="../css/animate.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="../css/owl.carousel.css" rel="stylesheet">
+	<link href="../css/style.css" rel="stylesheet" type="text/css" />
+	<link href="../css/colors/" rel="stylesheet" type="text/css" id="colors" />
     
 	<!-- FONTS -->
 	<link href='http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500italic,700,500,700italic,900,900italic' rel='stylesheet' type='text/css'>
@@ -60,6 +60,9 @@
 						<a><span class="b1">w</span><span class="b2">h</span><span class="b3">i</span><span class="b4">t</span><span class="b5">e</span></a>
 					</div><!-- //LOGO -->
 					
+					<!-- SEARCH FORM -->
+					<div id="search-form" class="pull-right">
+					</div><!-- SEARCH FORM -->
 					
 					<!-- MENU -->
 					<div class="pull-right">
@@ -76,32 +79,64 @@
 			</div><!-- //CONTAINER -->
 		</header><!-- //HEADER -->
 		
+		
 		<!-- BLOG -->
 		<section id="blog">
 			<!-- CONTAINER -->
 			<div class="container">	
 				<!-- BLOG BLOCK -->
-				<form>
-					<div>Регистрация</div>
-					<div>Имя</div>
-					<input type="email" name="login" required="required">
-					<div>Фамилия</div>
-					<input type="email" name="login" required="required">
-					<div>Отчество</div>
-					<input type="email" name="login" required="required">
-					<div>Номер группы</div>
-					<input type="email" name="login" required="required">
-					<div>Год поступления</div>
-					<input type="email" name="login" required="required">
-					<div>Email</div>
-					<input type="email" name="login" required="required">
-					<div>Логин</div>
-					<input type="email" name="login" required="required">					
-					<div>Пароль</div>
-					<input type="email" name="email" required="required">
-					<p><input type="button" value=" Зарегестрироваться "></p>
-					<p><input type="button" value=" Вход "></p>
-				</form>
+				<div>
+					<div>Выбор состояния</div>
+					<select name="theme" required="required">
+						<option>Готово</option>
+						<option>Не готово</option>
+					</select>
+					<div>Текст</div>
+					<input type="text" name="name" value="Введите текст" required="required">
+					<p><input type="button" value=" Save "></p>
+					<div>Файлы</div>
+					<div>Максимальный размер новых файлов: 50Мбайт, максимальное количество прикрепленных файлов: 3</div>
+					<div class="fp-toolbar">
+						<a role="button" title="Добавить..." class="btn btn-secondary btn-sm" href="#">
+							<i class="icon fa fa-file-o fa-fw " aria-hidden="true"  ></i>
+						</a>
+						<a role="button" title="Создать папку" class="btn btn-secondary btn-sm" href="#">
+							<i class="icon fa fa-folder-o fa-fw " aria-hidden="true"  ></i>
+						</a>
+						<a role="button" title="Скачать всё" class="btn btn-secondary btn-sm" href="#">
+							<i class="icon fa fa-download fa-fw " aria-hidden="true"  ></i>
+						</a>
+					</div>
+					<div class="fp-viewbar btn-group float-sm-right">
+						<a title="Показать папку с иконками файлов" class="fp-vb-icons btn btn-secondary btn-sm" href="#">
+							<i class="icon fa fa-th fa-fw " aria-hidden="true"  ></i>
+						</a>
+						<a title="Показать папку с подробностями файлов" class="fp-vb-details btn btn-secondary btn-sm" href="#">
+							<i class="icon fa fa-list fa-fw " aria-hidden="true"  ></i>
+						</a>
+						<a title="Показать папку как дерево файлов" class="fp-vb-tree btn btn-secondary btn-sm" href="#">
+							<i class="icon fa fa-folder fa-fw " aria-hidden="true"  ></i>
+						</a>
+					</div>
+					<div>Для загрузки файлов перетащите их сюда.</div>
+					<table width="500" height="100">
+						<tr valign=middle align=center><th>Перетащить сюда</th></tr>
+					</table>
+					<p>Поддерживаемые типы файлов:</p>
+					<div>
+						<ul>
+							<li>документ PDF <small class="text-muted muted">.pdf</small></li>
+							<li>документ Word <small class="text-muted muted">.doc</small></li>
+							<li>Документ Word 2007 <small class="text-muted muted">.docx</small></li>
+						</ul>
+					</div>
+				</div>
+				<div>
+					<p>
+						<input type="button" value=" Save ">
+						<input type="button" value=" Отмена ">
+					</p>					
+				</div>
 				<div style="position:absolute; bottom:0px;">
 					<ul>
 						<li>Проект 16.</a></li>
