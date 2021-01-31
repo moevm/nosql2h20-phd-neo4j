@@ -54,16 +54,29 @@ class MyApp:
                 query=query, exception=exception))
             raise
 
-    # login: $login, password: $password
+    ############################################
+
+    def new_work(self, student_args, work_args):
+        student_id = self.find_student_by_pass(student_args)
+        print(0)
+        if student_id is None:
+            return None
+        print(1)
+        work_id = self.add_work(work_args)
+        print(2)
+        self.assosiate_work_and_student(student_id, work_id)
+        print("New work was done")
+        return True
 
     def assosiate_work_and_student(self, student_id, work_id):
         with self.driver.session() as session:
-            # Write transactions allow the driver to handle retries and transient errors
             result = session.write_transaction(
                 self._assosiate_work_and_student, student_id, work_id)
 
             for record in result:
                 print(f"Assosiated student with id: {record['g']['id']} and work with id: {record['w']['id']}")
+
+            return True
 
     @staticmethod
     def _assosiate_work_and_student(tx, student_id, work_id):
@@ -91,6 +104,7 @@ class MyApp:
 
             for record in result:
                 print(f"Created work with id: {record['w']['id']}")
+            return record['w']['id']
 
     @staticmethod
     def _add_work(tx, *args):
@@ -107,21 +121,47 @@ class MyApp:
                 query=query, exception=exception))
             raise
 
-    def find_student(self, *args):
+    def find_student_by_pass(self, args):
         with self.driver.session() as session:
             # Write transactions allow the driver to handle retries and transient errors
             result = session.write_transaction(
-                self._find_student, *args)
+                self._find_student_by_pass, args)
+            print(result)
+            try:
+                student_id = result[0]['g']['id']
+                return student_id
+            except:
+                return None
+
+    @staticmethod
+    def _find_student_by_pass(tx, *args):
+        query = (
+            "MATCH(g:Graduate {login: $login, password: $password})"
+            "RETURN g"
+        )
+        result = tx.run(query, *args)
+        try:
+            return [{"g": record["g"]} for record in result]
+        except:
+            return None
+
+    ##############################################
+
+    def find_student_works_by_name(self, *args):
+        with self.driver.session() as session:
+            # Write transactions allow the driver to handle retries and transient errors
+            result = session.write_transaction(
+                self._find_student_by_name, *args)
             try:
                 student_id = str(result[0]['g']['id'])
                 works = session.write_transaction(
                     self._find_students_works, student_id)
-                print(works)
+                return works
             except:
                 return ["No results"]
 
     @staticmethod
-    def _find_student(tx, args):
+    def _find_student_by_name(tx, args):
         query = (
             "MATCH(g:Graduate {name: $name, surname: $surname, patronymic: $patronymic})"
             "RETURN g"
@@ -143,8 +183,7 @@ class MyApp:
         )
         result = tx.run(query, student_id=student_id)
         try:
-            return result
-        # Capture any errors along with the query and data for traceability
+            return [{"w": record["w"]} for record in result]
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
@@ -169,32 +208,32 @@ if __name__ == "__main__":
     user = "neo4j"
     password = "1234"
 
-    student = {
-        'id': student_id,
-        'name': 'Igor',
-        'surname': 'Filippov',
-        'patronymic': 'Sergeevich',
-        'group_number': 7382,
-        'year_of_admission': 2016,
-        'email': 'tmp@mail.ru',
-        'login': 'RedHash',
-        'password': '12345678'
-    }
-    student_id += 1
-
-    work = {
-        'id': work_id,
-        'semester': 6,
-        'index': 5,
-        'link': 'https://docs.google.com/document/d/1doSuQ7hXO8P6r3WzyJCcH1Koc955AL4egyVXMgqPcQE/edit#',
-    }
-    work_id += 1
+    # student = {
+    #     'id': student_id,
+    #     'name': 'Igor',
+    #     'surname': 'Filippov',
+    #     'patronymic': 'Sergeevich',
+    #     'group_number': 7382,
+    #     'year_of_admission': 2016,
+    #     'email': 'tmp@mail.ru',
+    #     'login': 'RedHash',
+    #     'password': '12345678'
+    # }
+    # student_id += 1
+    #
+    # work = {
+    #     'id': work_id,
+    #     'semester': 6,
+    #     'index': 5,
+    #     'link': 'https://docs.google.com/document/d/1doSuQ7hXO8P6r3WzyJCcH1Koc955AL4egyVXMgqPcQE/edit#',
+    # }
+    # work_id += 1
 
     app = MyApp(url, user, password)
 
-    app.add_graduate(student)
-    app.add_work(work)
-    app.assosiate_work_and_student(0, 0)
+    # app.add_graduate(student)
+    # app.add_work(work)
+    # app.assosiate_work_and_student(0, 0)
 
     app.clear_db()
 

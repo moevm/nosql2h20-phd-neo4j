@@ -21,6 +21,7 @@ def home():
 def add_asp():
     if request.method == 'POST':
         print("Запрос на добавление аспиранта")
+        global student_id
         student = {
             'id': student_id,
             'name': request.form['Name'],
@@ -34,6 +35,7 @@ def add_asp():
         }
 
         app.add_graduate(student)
+        student_id += 1
 
         return render_template('add_asp.html')
 
@@ -44,6 +46,20 @@ def add_asp():
 def add_task():
     if request.method == 'POST':
         print("Запрос на добавление работы")
+        student = {
+            'login': request.form['Login'],
+            'password': request.form['Pass'],
+        }
+
+        global work_id
+        work = {
+            'id': work_id,
+            'semester': request.form['Semester'],
+            'index': request.form['Index'],
+            'link': request.form['Link'],
+        }
+        if app.new_work(student, work):
+            work_id += 1
 
     return render_template('add_task.html')
 
@@ -58,7 +74,7 @@ def watch():
             'surname': request.form['Surname'],
             'patronymic': request.form['Patronymic'],
         }
-        list = app.find_student(student)
+        list = app.find_student_works_by_name(student)
         return "<p>" + "</p><p>".join(list) + "</p>"
 
     return render_template('watch.html')
