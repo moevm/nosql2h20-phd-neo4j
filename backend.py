@@ -23,7 +23,9 @@ work_id = 0
 
 
 class MyApp:
-    def __init__(self, uri, user, password):
+    def __init__(self, uri="bolt://localhost:11003",
+                 user="neo4j",
+                 password="1234"):
         print("Rising database...")
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
@@ -35,13 +37,13 @@ class MyApp:
         with self.driver.session() as session:
             # Write transactions allow the driver to handle retries and transient errors
             result = session.write_transaction(
-                self._add_and_return_graduate, student_dict)
+                self._add_graduate, student_dict)
 
             for record in result:
                 print(f"Created student with name: {record['g']}")
 
     @staticmethod
-    def _add_and_return_graduate(tx, *args):
+    def _add_graduate(tx, *args):
         query = (
             "CREATE (g:Graduate { id: $id, name: $name, surname: $surname, patronymic: $patronymic, group_number: $group_number, year_of_admission: $year_of_admission, email: $email, login: $login, password: $password}) "
             "RETURN g"
@@ -59,15 +61,15 @@ class MyApp:
         with self.driver.session() as session:
             # Write transactions allow the driver to handle retries and transient errors
             result = session.write_transaction(
-                self._add_and_return_work, work_dict)
+                self._add_work, work_dict)
 
             for record in result:
                 print(f"Created work with id: {record['w']['id']}")
 
     @staticmethod
-    def _add_and_return_work(tx, *args):
+    def _add_work(tx, *args):
         query = (
-            "CREATE (w:Work { id: $id, semester: $semester, index: $index}) "
+            "CREATE (w:Work { id: $id, semester: $semester, index: $index, link: $link}) "
             "RETURN w"
         )
         result = tx.run(query, *args)
@@ -141,7 +143,8 @@ if __name__ == "__main__":
     work = {
         'id': work_id,
         'semester': 6,
-        'index': 5
+        'index': 5,
+        'link': 'https://docs.google.com/document/d/1doSuQ7hXO8P6r3WzyJCcH1Koc955AL4egyVXMgqPcQE/edit#',
     }
     work_id += 1
 
@@ -149,7 +152,6 @@ if __name__ == "__main__":
 
     app.add_graduate(student)
     app.add_work(work)
-
     app.assosiate_work_and_student(0, 0)
 
     app.clear_db()
