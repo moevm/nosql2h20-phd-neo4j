@@ -1,0 +1,104 @@
+1. Neo4jl
+
+Модель состоит из двух сущностей - Graduate и Work. Они связаны между собой ссылкой DID.
+Не каждый студент может иметь работу, но каждая работа должна быть сделана студентом
+
+Метками узлов являются:
+	Graduate:
+		* id - Int - уникальный идентификатор человека
+		* name - String - имя
+		* surname - String - фамилия
+		* patronymic - String - отчество
+		* group number - Int - номер группы
+		* year of admission - Int - год поступленияя
+		* email - String - email
+		* login - String - логин, чтобы добавлять себе сделанные работы
+		* password - String - пароль, чтобы добавлять себе сделанные работы
+	Work:
+		* id - int - уникальный идентификатор работы
+		* semester - Int - семестр, в котором она была выполнена
+		* index - Int - номер работы в списке работ аспиранта
+		* link - String - ссылка на google doc работы
+
+Примеры запросов:
+
+Добавить студента
+"CREATE (g:Graduate { id: $id, name: $name, surname: $surname, patronymic: $patronymic, group_number: $group_number, year_of_admission: $year_of_admission, email: $email, login: $login, password: $password}) "
+
+Cоздать отношение
+"MATCH(g:Graduate {id: $student_id})"
+"MATCH(w:Work {id: $work_id})"
+"CREATE (g)-[:DID]->(w) "
+
+2. Mongo DB
+
+Модель состоит из 2 коллекций:
+	Graduate - хранит информацию о студенте
+		* id - Int - уникальный идентификатор человека
+		* name - String - имя
+		* surname - String - фамилия
+		* patronymic - String - отчество
+		* group number - Int - номер группы
+		* year of admission - Int - год поступленияя
+		* email - String - email
+		* login - String - логин, чтобы добавлять себе сделанные работы
+		* password - String - пароль, чтобы добавлять себе сделанные работый)
+
+		* works - Object - работы, если есть
+			* p_id - Array[Object] - список работ
+
+	Work - хранит информацию о работе
+		* id - int - уникальный идентификатор работы
+		* semester - Int - семестр, в котором она была выполнена
+		* index - Int - номер работы в списке работ аспиранта
+		* link - String - ссылка на google doc работы
+
+		* student - Object - студент, сделавший её
+			* f_id - Int - идентификатор студента
+
+Примеры запросов:
+
+Добавить студента
+db.person.insert_many([{
+	'id' : id,
+	'name' : "Igor",
+    'surname' : "Filippov",
+    'patronymic' : "Sergeevich",
+    'group number' : 7382,
+    'year of admission' : 2016,
+    'email' : "filippovis.igor@yandex.ru",
+    'login' : "RedHash",
+    'password' : "123",
+	'works' : works,
+}])
+
+SQL
+
+Нужно хранить несколько таблиц - Students, Works, StudentsWork
+
+	1) Student
+		* id - Int - уникальный идентификатор человека
+		* name - String - имя
+		* surname - String - фамилия
+		* patronymic - String - отчество
+		* group number - Int - номер группы
+		* year of admission - Int - год поступленияя
+		* email - String - email
+		* login - String - логин, чтобы добавлять себе сделанные работы
+		* password - String - пароль, чтобы добавлять себе сделанные работый)
+	2) Works
+		* id - int - уникальный идентификатор работы
+		* user_login - Int - уникальный идентификатор человека
+		* semester - Int - семестр, в котором она была выполнена
+		* index - Int - номер работы в списке работ аспиранта
+		* link - String - ссылка на google doc работы
+
+Примеры запросов:
+
+Удаление:
+DELETE FROM Students WHERE id = '0'
+
+Оценка:
+
+Neo4j является отличным выбором для данного задания, т.к. все данные можно представить в виде множества подграфов вида:
+Студент -> Работы, но и стандартные средства SQL не проигрывают из-за стандартного отношения 1->Many

@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<main role="main" class="inner cover">
+    <h1 class="cover-heading">Добавить выполненное задание</h1>
+
+    <form action="/add_task" method="POST">
+        <div class="form-group">
+            <input type="text" class="form-control" name="Index" id="Index" aria-describedby="gradeHelp"
+                   placeholder="Индекс">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="Semester" id="Semester" aria-describedby="gradeHelp"
+                   placeholder="Семест">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="Link" id="Link" aria-describedby="gradeHelp"
+                   placeholder="Ссылка на документ">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="Login" id="Login" aria-describedby="gradeHelp"
+                   placeholder="Login">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="Pass" id="Pass" aria-describedby="gradeHelp"
+                   placeholder="Password">
+        </div>
+
+        <button type="submit" class="btn btn-lg btn-secondary">Добавить!</button>
+    </form>
+
+    {% if done is not none %}
+        <h2>Done!</h2>
+    {% endif %}
+</main>
+{% endblock %}
