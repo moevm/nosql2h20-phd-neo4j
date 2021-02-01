@@ -6,11 +6,6 @@
 
     <form action="/add_asp" method="POST">
         <div class="form-group">
-            <input type="text" class="form-control" name="Name" id="Name" aria-describedby="gradeHelp"
-                   placeholder="Имя">
-        </div>
-
-        <div class="form-group">
             <input type="text" class="form-control" name="Surname" id="Surname" aria-describedby="gradeHelp"
                    placeholder="Фамилия">
         </div>
@@ -18,6 +13,11 @@
         <div class="form-group">
             <input type="text" class="form-control" name="Patronymic" id="Patronymic" aria-describedby="gradeHelp"
                    placeholder="Отчество">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="Name" id="Name" aria-describedby="gradeHelp"
+                   placeholder="Имя">
         </div>
 
         <div class="form-group">
@@ -48,5 +48,9 @@
         <button type="submit" class="btn btn-lg btn-secondary">Добавить!</button>
 
     </form>
+
+    {% if done is not none %}
+        <h2>Done!</h2>
+    {% endif %}
 </main>
 {% endblock %}

@@ -4,5 +4,16 @@
 <main role="main" class="inner cover">
     <h1 class="cover-heading">Аттестация аспирантов</h1>
     <p class="lead">Цель - создать условия, которые помогут аспиранту дойти до защиты с подготовленной диссертацией и успешно защититься</p>
+
+     <form method="post" action="/">
+         <input type="submit" value="Clear" name="Clear"/>
+        <input type="submit" value="Export" name="Export"/>
+        <input type="submit" value="Import" name="Import" />
+     </form>
+
+    {% if done is not none %}
+        <h2>Done!</h2>
+    {% endif %}
+
 </main>
 {% endblock %}

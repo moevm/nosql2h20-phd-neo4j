@@ -31,7 +31,10 @@
         </div>
 
         <button type="submit" class="btn btn-lg btn-secondary">Добавить!</button>
-
     </form>
+
+    {% if done is not none %}
+        <h2>Done!</h2>
+    {% endif %}
 </main>
 {% endblock %}
