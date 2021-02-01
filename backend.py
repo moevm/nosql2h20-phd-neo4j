@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 
@@ -21,11 +22,12 @@ work_to_index = {key: value for value, key in index_to_work.items()}
 
 
 class MyApp:
-    def __init__(self, uri="bolt://localhost:11003",
+    def __init__(self, uri="bolt://neo4j:7687",
                  user="neo4j",
-                 password="1234"):
+                 password="test"):
         print("Rising database...")
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
+        self.clear_db()
 
     def close(self):
         # Don't forget to close the driver connection when you are finished with it
@@ -153,18 +155,18 @@ class MyApp:
             # Write transactions allow the driver to handle retries and transient errors
             result = session.write_transaction(
                 self._find_student_by_name, args)
-            # try:
-            student_id = str(result[0]['g']['id'])
-            works = session.write_transaction(
-                self._find_students_works, student_id)
-            print(works)
-            list_to_print = [f"Work {i}. Type: {index_to_work[int(work['w']['index'])]}. " \
-                             f"Semester: {work['w']['semester']}. " \
-                             f"Link: {work['w']['link']}." for i, work in enumerate(works)]
-            print(list_to_print)
-            return list_to_print
-            # except:
-            #     return ["No results"]
+            try:
+                student_id = str(result[0]['g']['id'])
+                works = session.write_transaction(
+                    self._find_students_works, student_id)
+                print(works)
+                list_to_print = [f"Work {i}. Type: {index_to_work[int(work['w']['index'])]}. " \
+                                 f"Semester: {work['w']['semester']}. " \
+                                 f"Link: {work['w']['link']}." for i, work in enumerate(works)]
+                print(list_to_print)
+                return list_to_print
+            except:
+                return ["No results"]
 
     @staticmethod
     def _find_student_by_name(tx, *args):
@@ -210,17 +212,23 @@ class MyApp:
         )
         tx.run(query)
 
-    def import_db(self):
-        pass
-
     def export_db(self):
         with self.driver.session() as session:
-            # экспорт в папку tmp
-            query = (
-                "CALL apoc.export.json.all('./all.json',{})"
-            )
-            print(json.dumps(session.run(query).data()))
-            return session.run(query).data()
+            session.write_transaction(self._export_db)
+
+    @staticmethod
+    def _export_db(tx):
+        query = '''CALL apoc.export.csv.all("all.csv", {useTypes:true});'''
+        return tx.run(query)
+
+    def import_db(self):
+        with self.driver.session() as session:
+            session.write_transaction(self._import_db)
+
+    @staticmethod
+    def _import_db(tx):
+        query = '''LOAD CSV FROM "all.csv"'''
+        return tx.run(query)
 
 
 if __name__ == "__main__":

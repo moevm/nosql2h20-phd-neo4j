@@ -7,6 +7,7 @@ from backend import MyApp
 app = MyApp()
 
 app_server = Flask(__name__, static_folder='static')
+print("Flask app is running...")
 
 student_id = 0
 work_id = 0
@@ -21,7 +22,10 @@ def home():
             app.export_db()
         elif request.form.get('Import') == 'Import':
             print("Import")
-            app.export_db()
+            app.import_db()
+        elif request.form.get('Clear') == 'Clear':
+            print("Clear db")
+            app.clear_db()
         return render_template('home.html', done=True)
     return render_template('home.html', done=None)
 
@@ -67,10 +71,10 @@ def add_task():
             'index': request.form['Index'],
             'link': request.form['Link'],
         }
+
         if app.new_work(student, work):
             work_id += 1
-
-        return render_template('add_task.html', done=True)
+            return render_template('add_task.html', done=True)
 
     return render_template('add_task.html', done=None)
 
