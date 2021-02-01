@@ -1,3 +1,4 @@
+import json
 import logging
 
 from neo4j import GraphDatabase
@@ -147,26 +148,31 @@ class MyApp:
 
     ##############################################
 
-    def find_student_works_by_name(self, *args):
+    def find_student_works_by_name(self, args):
         with self.driver.session() as session:
             # Write transactions allow the driver to handle retries and transient errors
             result = session.write_transaction(
-                self._find_student_by_name, *args)
-            try:
-                student_id = str(result[0]['g']['id'])
-                works = session.write_transaction(
-                    self._find_students_works, student_id)
-                return works
-            except:
-                return ["No results"]
+                self._find_student_by_name, args)
+            # try:
+            student_id = str(result[0]['g']['id'])
+            works = session.write_transaction(
+                self._find_students_works, student_id)
+            print(works)
+            list_to_print = [f"Work {i}. Type: {index_to_work[int(work['w']['index'])]}. " \
+                             f"Semester: {work['w']['semester']}. " \
+                             f"Link: {work['w']['link']}." for i, work in enumerate(works)]
+            print(list_to_print)
+            return list_to_print
+            # except:
+            #     return ["No results"]
 
     @staticmethod
-    def _find_student_by_name(tx, args):
+    def _find_student_by_name(tx, *args):
         query = (
             "MATCH(g:Graduate {name: $name, surname: $surname, patronymic: $patronymic})"
             "RETURN g"
         )
-        result = tx.run(query, args)
+        result = tx.run(query, *args)
         try:
             return [{"g": record["g"]} for record in result]
         # Capture any errors along with the query and data for traceability
@@ -177,13 +183,15 @@ class MyApp:
 
     @staticmethod
     def _find_students_works(tx, student_id):
+        print(f"Finding works done by student_id {student_id}")
+
+        cmd = "MATCH (g:Graduate {id: %d})-[:DID]->(w) RETURN w" % int(student_id)
         query = (
-            "MATCH (g:Graduate {id: $student_id})-[:DID]->(w) "
-            "RETURN w"
+            cmd
         )
-        result = tx.run(query, student_id=student_id)
+        result = tx.run(query)
         try:
-            return [{"w": record["w"]} for record in result]
+            return [{'w': record["w"]} for record in result]
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
@@ -201,6 +209,18 @@ class MyApp:
             "DETACH DELETE n"
         )
         tx.run(query)
+
+    def import_db(self):
+        pass
+
+    def export_db(self):
+        with self.driver.session() as session:
+            # экспорт в папку tmp
+            query = (
+                "CALL apoc.export.json.all('./all.json',{})"
+            )
+            print(json.dumps(session.run(query).data()))
+            return session.run(query).data()
 
 
 if __name__ == "__main__":

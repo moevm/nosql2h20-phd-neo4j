@@ -14,7 +14,16 @@ work_id = 0
 
 @app_server.route('/', methods=['GET', 'POST'])
 def home():
-    return render_template('home.html')
+    print(request.method)
+    if request.method == 'POST':
+        if request.form.get('Export') == 'Export':
+            print("Export")
+            app.export_db()
+        elif request.form.get('Import') == 'Import':
+            print("Import")
+            app.export_db()
+        return render_template('home.html', done=True)
+    return render_template('home.html', done=None)
 
 
 @app_server.route('/add_asp', methods=['GET', 'POST'])
@@ -37,9 +46,9 @@ def add_asp():
         app.add_graduate(student)
         student_id += 1
 
-        return render_template('add_asp.html')
+        return render_template('add_asp.html', done=True)
 
-    return render_template('add_asp.html')
+    return render_template('add_asp.html', done=None)
 
 
 @app_server.route('/add_task', methods=['GET', 'POST'])
@@ -61,7 +70,9 @@ def add_task():
         if app.new_work(student, work):
             work_id += 1
 
-    return render_template('add_task.html')
+        return render_template('add_task.html', done=True)
+
+    return render_template('add_task.html', done=None)
 
 
 @app_server.route('/watch', methods=['GET', 'POST'])
