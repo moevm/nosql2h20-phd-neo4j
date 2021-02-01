@@ -12,8 +12,8 @@ demo.mov
 demo.avi
 ```
 
-- [x] [Use cases](https://github.com/moevm/nosql2h20-relatives-mongo/wiki/Usecases)
-- [x] [Модель данных](https://github.com/moevm/nosql2h20-relatives-mongo/blob/master/demo/media/datamodel_model.jpg)
+- [x] [Use cases](https://github.com/moevm/nosql2h20-phd-neo4j/wiki/Use-case)
+- [x] [Модель данных](https://github.com/moevm/nosql2h20-phd-neo4j/wiki/Data-model)
 - [x] Доп. задание
  
  
