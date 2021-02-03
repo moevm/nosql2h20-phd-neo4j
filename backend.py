@@ -5,6 +5,8 @@ import logging
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable
 
+from calculate_mark import calc_mark
+
 index_to_work = {
     0: "Обзор литературы",
     1: "Опубликованная статья",
@@ -27,7 +29,7 @@ class MyApp:
                  password="test"):
         print("Rising database...")
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
-        self.clear_db()
+        # self.clear_db()
 
     def close(self):
         # Don't forget to close the driver connection when you are finished with it
@@ -160,13 +162,18 @@ class MyApp:
                 works = session.write_transaction(
                     self._find_students_works, student_id)
                 print(works)
-                list_to_print = [f"Work {i}. Type: {index_to_work[int(work['w']['index'])]}. " \
+                list_to_print = [f"Type: {index_to_work[int(work['w']['index'])]}. " \
                                  f"Semester: {work['w']['semester']}. " \
                                  f"Link: {work['w']['link']}." for i, work in enumerate(works)]
                 print(list_to_print)
-                return list_to_print
+
+                stat = {(int(work['w']['index']), int(work['w']['semester'])) for _, work in enumerate(works)}
+
+                mark = calc_mark(stat)
+                print(f"Mark is {mark}")
+                return list_to_print, mark
             except:
-                return ["No results"]
+                return ["No results"], '2'
 
     @staticmethod
     def _find_student_by_name(tx, *args):
