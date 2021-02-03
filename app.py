@@ -89,7 +89,15 @@ def watch():
             'surname': request.form['Surname'],
             'patronymic': request.form['Patronymic'],
         }
-        list = app.find_student_works_by_name(student)
-        return "<p>" + "</p><p>".join(list) + "</p>"
+        list, mark = app.find_student_works_by_name(student)
+
+        pattern = ""
+        for work in list:
+            pattern += f"<li>{work}</li>"
+        html_list = "<ol>" + pattern + "</ol>"
+
+        html_list += f"<p> Оценка на данный момент: {mark} </p>"
+
+        return html_list
 
     return render_template('watch.html')
